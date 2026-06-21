@@ -146,16 +146,19 @@
     .dropdown-menu {
       display: none;
       position: absolute;
-      top: calc(100% + 10px);
+      top: 100%;
       left: 50%;
       transform: translateX(-50%);
+      padding-top: 10px;
+      min-width: 170px;
+      z-index: 400;
+    }
+    .dropdown-menu-inner {
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: 10px;
       box-shadow: var(--shadow-lg);
-      min-width: 170px;
       overflow: hidden;
-      z-index: 400;
     }
     .nav-dropdown:hover .dropdown-menu,
     .nav-dropdown:focus-within .dropdown-menu { display: block; }
@@ -171,6 +174,7 @@
     }
     .dropdown-menu a:last-child { border-bottom: none; }
     .dropdown-menu a:hover { background: var(--light) !important; color: var(--dark) !important; }
+    .dropdown-menu a { display: block !important; padding: 11px 18px !important; border-radius: 0 !important; border-bottom: 1px solid var(--border); font-size: 0.88rem !important; background: none !important; color: var(--dark3) !important; white-space: nowrap; }
 
     /* hamburger */
     .hamburger {
@@ -1151,10 +1155,12 @@
           <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </a>
         <div class="dropdown-menu">
-          <a href="#proc-my">Proč my</a>
-          <a href="#o-mne">O mně</a>
-          <a href="#prace">Realizace</a>
-          <a href="#faq">FAQ</a>
+          <div class="dropdown-menu-inner">
+            <a href="#proc-my">Proč my</a>
+            <a href="#o-mne">O mně</a>
+            <a href="#prace">Realizace</a>
+            <a href="#faq">FAQ</a>
+          </div>
         </div>
       </li>
       <li><a href="#kontakt">Kontakt</a></li>
