@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instalatér Čermák – Ostrava | Havarijní služba 24/7</title>
+  <meta name="description" content="Instalatér a topenář Robert Čermák – Ostrava a okolí. Havarijní výjezd do 60 minut, čištění odpadů, topení, rekonstrukce koupelen. Hodnocení 4,9★. Volejte 704 395 355." />
+  <meta property="og:title" content="Instalatér Čermák – Ostrava | Havarijní služba 24/7" />
+  <meta property="og:description" content="Ucpaný odpad, teče voda, nefunguje topení? Výjezd do 60 minut. Hodnocení 4,9★ na Google. Volejte kdykoliv: 704 395 355." />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow:      #F5C518;
+      --yellow-dark: #c9a200;
+      --yellow-bg:   rgba(245,197,24,0.1);
+      --dark:        #0f172a;
+      --dark2:       #1e293b;
+      --dark3:       #334155;
+      --gray:        #64748b;
+      --light:       #f8fafc;
+      --border:      #e2e8f0;
+      --white:       #ffffff;
+      --r:           12px;
+      --shadow:      0 4px 24px rgba(0,0,0,0.08);
+      --shadow-lg:   0 12px 40px rgba(0,0,0,0.14);
+    }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--dark);
+      background: var(--white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .anim {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .anim.visible { opacity: 1; transform: translateY(0); }
+    .anim-d1 { transition-delay: 0.1s; }
+    .anim-d2 { transition-delay: 0.2s; }
+    .anim-d3 { transition-delay: 0.3s; }
+    .anim-d4 { transition-delay: 0.4s; }
+    .anim-d5 { transition-delay: 0.5s; }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      background: var(--dark);
+      padding: 9px 0;
+    }
+    .topbar-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+    }
+    .topbar-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #94a3b8;
+      text-decoration: none;
+    }
+    .topbar-item svg { color: var(--yellow); flex-shrink: 0; }
+    .topbar-item strong { color: var(--white); }
+    .topbar-item:hover strong { color: var(--yellow); }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      background: var(--white);
+      border-bottom: 2px solid var(--yellow);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    }
+    .nav-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+    .logo {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--dark);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .logo span { color: var(--yellow-dark); }
+    .logo small { display: block; font-size: 0.65rem; font-weight: 500; color: var(--gray); letter-spacing: 0; margin-top: 1px; }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--dark3);
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 7px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { background: var(--yellow-bg); color: var(--dark); }
+    .nav-cta {
+      background: var(--yellow) !important;
+      color: var(--dark) !important;
+      font-weight: 700 !important;
+      padding: 9px 18px !important;
+    }
+    .nav-cta:hover { background: var(--yellow-dark) !important; }
+
+    /* hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      border: none;
+      background: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--dark);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 16px 24px 24px;
+      gap: 4px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      text-decoration: none;
+      color: var(--dark);
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 12px 16px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .mobile-menu a:hover { background: var(--light); }
+    .mobile-menu .m-cta {
+      background: var(--yellow);
+      color: var(--dark);
+      font-weight: 700;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: url('hero.png') center center / cover no-repeat;
+    }
+    .hero::before { display: none; }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, rgba(15,23,42,0.88) 45%, rgba(15,23,42,0.55) 100%);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 80px 24px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 64px;
+      align-items: center;
+      width: 100%;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--yellow-bg);
+      border: 1px solid rgba(245,197,24,0.3);
+      color: var(--yellow);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--white);
+      margin-bottom: 18px;
+      letter-spacing: -1px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--yellow);
+    }
+    .hero-sub {
+      color: #94a3b8;
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 14px 26px;
+      border-radius: var(--r);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-yellow {
+      background: var(--yellow);
+      color: var(--dark);
+      box-shadow: 0 4px 16px rgba(245,197,24,0.35);
+    }
+    .btn-yellow:hover { background: var(--yellow-dark); box-shadow: 0 6px 20px rgba(245,197,24,0.45); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.2);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.4); }
+
+    /* hero stats */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--r);
+      padding: 22px 18px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .stat-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(245,197,24,0.3); }
+    .stat-num {
+      display: block;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--yellow);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    /* ─── EMERGENCY STRIP ─── */
+    .emergency {
+      background: var(--yellow);
+      padding: 18px 24px;
+    }
+    .emergency-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .emergency-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .emergency-left svg { color: var(--dark); flex-shrink: 0; }
+    .emergency-text { font-weight: 700; font-size: 0.98rem; color: var(--dark); }
+    .emergency-text small { display: block; font-weight: 400; font-size: 0.82rem; color: #374151; margin-top: 1px; }
+    .emergency-phone {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--dark);
+      text-decoration: none;
+      letter-spacing: -1px;
+    }
+    .emergency-phone:hover { color: #1e293b; }
+
+    /* ─── GENERIC SECTION ─── */
+    .section { padding: 88px 24px; }
+    .section-inner { max-width: 1140px; margin: 0 auto; }
+    .section-tag {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--yellow-dark);
+      margin-bottom: 10px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--gray);
+      max-width: 520px;
+      margin: 0 auto 56px;
+      font-size: 0.97rem;
+      line-height: 1.65;
+    }
+
+    /* ─── SVG ICON HELPER ─── */
+    .icon {
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    /* ─── SERVICES ─── */
+    .services { background: var(--white); }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .svc-card {
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px 24px;
+      transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
+      cursor: default;
+    }
+    .svc-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+      border-color: var(--yellow);
+    }
+    .svc-icon {
+      width: 50px;
+      height: 50px;
+      background: var(--yellow);
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      color: var(--dark);
+    }
+    .svc-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .svc-card p {
+      font-size: 0.875rem;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+    .svc-card.dark {
+      background: var(--dark);
+      border-color: var(--dark2);
+    }
+    .svc-card.dark h3 { color: var(--white); }
+    .svc-card.dark p { color: #94a3b8; }
+    .svc-card.dark:hover { border-color: var(--yellow); }
+    .svc-card.dark .svc-icon { background: var(--yellow); }
+
+    /* ─── ABOUT ─── */
+    .about { background: var(--light); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 64px;
+      align-items: center;
+    }
+    /* image placeholder */
+    .img-ph {
+      background: var(--border);
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #94a3b8;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-align: center;
+      padding: 20px;
+    }
+    .img-ph svg { opacity: 0.5; }
+    .img-ph-portrait { aspect-ratio: 3/4; }
+    .img-ph-landscape { aspect-ratio: 16/9; }
+    .img-ph-square { aspect-ratio: 1; }
+
+    .about-text { display: flex; flex-direction: column; gap: 20px; }
+    .about-text h2 {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+    .about-text h2 span { color: var(--yellow-dark); }
+    .about-text p { font-size: 0.95rem; color: var(--gray); line-height: 1.7; }
+    .cert-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .cert-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--dark3);
+      box-shadow: var(--shadow);
+    }
+    .cert-badge svg { color: var(--yellow-dark); }
+
+    /* ─── GALLERY ─── */
+    .gallery { background: var(--white); }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .gallery-item { position: relative; overflow: hidden; border-radius: var(--r); }
+    .gallery-item .img-ph-landscape { border-radius: var(--r); border-style: dashed; }
+    .gallery-item .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15,23,42,0);
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+      transition: background 0.3s;
+      border-radius: var(--r);
+    }
+    .gallery-item:hover .overlay { background: rgba(15,23,42,0.55); }
+    .gallery-tag {
+      background: var(--yellow);
+      color: var(--dark);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .gallery-item:hover .gallery-tag { opacity: 1; transform: translateY(0); }
+
+    /* ─── WHY + REVIEWS ─── */
+    .why { background: var(--light); }
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .why-list { display: flex; flex-direction: column; gap: 22px; }
+    .why-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .why-ico {
+      width: 44px;
+      height: 44px;
+      background: var(--yellow);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--dark);
+      flex-shrink: 0;
+    }
+    .why-item h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+    .why-item p { font-size: 0.875rem; color: var(--gray); line-height: 1.55; }
+
+    .reviews-col { display: flex; flex-direction: column; gap: 14px; }
+    .rating-hero {
+      background: var(--dark);
+      border-radius: var(--r);
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .rating-big { font-size: 3rem; font-weight: 900; color: var(--yellow); line-height: 1; }
+    .rating-stars { font-size: 1.1rem; color: var(--yellow); margin-bottom: 4px; }
+    .rating-info { font-size: 0.88rem; font-weight: 600; color: var(--white); }
+    .rating-info small { display: block; color: #64748b; font-weight: 400; margin-top: 2px; }
+    .review-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+    }
+    .review-stars { color: var(--yellow); font-size: 0.88rem; margin-bottom: 8px; }
+    .review-text { font-size: 0.9rem; color: var(--dark3); line-height: 1.55; margin-bottom: 10px; }
+    .review-author { font-size: 0.8rem; color: var(--gray); font-weight: 600; }
+
+    /* ─── FAQ ─── */
+    .faq { background: var(--white); }
+    .faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 20px 22px;
+      font-family: inherit;
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: var(--dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background 0.15s;
+    }
+    .faq-q:hover { background: var(--light); }
+    .faq-q.open { background: var(--light); color: var(--dark); }
+    .faq-chevron {
+      flex-shrink: 0;
+      color: var(--gray);
+      transition: transform 0.3s;
+    }
+    .faq-q.open .faq-chevron { transform: rotate(180deg); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .faq-a-inner {
+      padding: 0 22px 20px;
+      font-size: 0.9rem;
+      color: var(--gray);
+      line-height: 1.7;
+    }
+
+    /* ─── PRICING ─── */
+    .pricing { background: var(--light); }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 920px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    .price-card {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: var(--r);
+      padding: 30px 26px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .price-card:hover { box-shadow: var(--shadow-lg); }
+    .price-card.featured {
+      background: var(--dark);
+      border-color: var(--yellow);
+      position: relative;
+      padding-top: 42px;
+    }
+    .price-badge {
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--yellow);
+      color: var(--dark);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 0 0 8px 8px;
+    }
+    .price-tag { font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--yellow-dark); margin-bottom: 6px; }
+    .price-card.featured .price-tag { color: var(--yellow); }
+    .price-name { font-size: 1.05rem; font-weight: 700; margin-bottom: 14px; }
+    .price-card.featured .price-name { color: var(--white); }
+    .price-amount {
+      font-size: 2.1rem;
+      font-weight: 900;
+      color: var(--yellow-dark);
+      letter-spacing: -1px;
+      margin-bottom: 2px;
+    }
+    .price-card.featured .price-amount { color: var(--yellow); }
+    .price-note { font-size: 0.8rem; color: var(--gray); margin-bottom: 22px; }
+    .price-card.featured .price-note { color: #64748b; }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .price-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+    .price-card.featured .price-features li { color: #94a3b8; }
+    .price-features li svg { color: var(--yellow-dark); flex-shrink: 0; }
+    .price-card.featured .price-features li svg { color: var(--yellow); }
+
+    /* ─── CONTACT ─── */
+    .contact { background: var(--dark); }
+    .contact .section-tag { color: var(--yellow); }
+    .contact .section-title { color: var(--white); }
+    .contact .section-sub { color: #64748b; }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 56px;
+    }
+    .contact-info { display: flex; flex-direction: column; gap: 0; }
+    .contact-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .contact-row:last-child { border-bottom: none; }
+    .c-ico {
+      width: 44px;
+      height: 44px;
+      background: rgba(245,197,24,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--yellow);
+      flex-shrink: 0;
+    }
+    .contact-row h4 { font-size: 0.75rem; color: #475569; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .contact-row p, .contact-row a {
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .contact-row a:hover { color: var(--yellow); }
+
+    .contact-form { display: flex; flex-direction: column; gap: 12px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-field label { font-size: 0.78rem; font-weight: 600; color: #64748b; }
+    .contact-form input,
+    .contact-form textarea,
+    .contact-form select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 9px;
+      padding: 12px 15px;
+      color: var(--white);
+      font-size: 0.92rem;
+      font-family: inherit;
+      transition: border-color 0.2s, background 0.2s;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder { color: #334155; }
+    .contact-form select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+    .contact-form select option { background: #1e293b; color: var(--white); }
+    .contact-form input:focus,
+    .contact-form textarea:focus,
+    .contact-form select:focus { border-color: var(--yellow); background: rgba(255,255,255,0.08); }
+    .contact-form textarea { height: 110px; resize: vertical; }
+    .btn-send {
+      background: var(--yellow);
+      color: var(--dark);
+      font-weight: 700;
+      font-size: 0.97rem;
+      padding: 14px;
+      border: none;
+      border-radius: var(--r);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(245,197,24,0.3);
+    }
+    .btn-send:hover { background: var(--yellow-dark); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(245,197,24,0.4); }
+    .form-success {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245,197,24,0.1);
+      border: 1px solid rgba(245,197,24,0.3);
+      color: var(--yellow);
+      padding: 12px 16px;
+      border-radius: 9px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #060c17;
+      color: #475569;
+      padding: 56px 24px 32px;
+    }
+    .footer-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 28px;
+    }
+    .footer-logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .footer-logo span { color: var(--yellow); }
+    .footer-desc { font-size: 0.85rem; line-height: 1.65; margin-bottom: 18px; color: #475569; }
+    .footer-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--yellow);
+      text-decoration: none;
+    }
+    .footer-col h5 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 16px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { color: #475569; text-decoration: none; font-size: 0.875rem; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--yellow); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+    }
+
+    /* ─── FLOATING CTA ─── */
+    .float-cta {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      z-index: 300;
+      background: var(--yellow);
+      color: var(--dark);
+      font-weight: 800;
+      font-size: 0.95rem;
+      padding: 14px 20px;
+      border-radius: 100px;
+      text-decoration: none;
+      box-shadow: 0 6px 24px rgba(245,197,24,0.5);
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .float-cta:hover { transform: scale(1.05); box-shadow: 0 8px 28px rgba(245,197,24,0.6); }
+
+    /* ─── MAP ─── */
+    .map-section { background: var(--light); padding: 0; }
+    .map-wrapper {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 88px 24px;
+    }
+    .map-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .map-info { display: flex; flex-direction: column; gap: 20px; }
+    .map-info h2 {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+    .map-info h2 span { color: var(--yellow-dark); }
+    .map-info p { font-size: 0.95rem; color: var(--gray) !important; line-height: 1.7; }
+    .map-towns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .map-town {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--dark3);
+    }
+    .map-town::before { content: ''; width: 6px; height: 6px; background: var(--yellow); border-radius: 50%; flex-shrink: 0; }
+    #map {
+      height: 420px;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      z-index: 1;
+    }
+    .leaflet-popup-content-wrapper {
+      border-radius: 10px !important;
+      font-family: 'Inter', sans-serif !important;
+      box-shadow: var(--shadow-lg) !important;
+    }
+    .leaflet-popup-content { font-size: 0.9rem !important; }
+    @media (max-width: 900px) {
+      .map-grid { grid-template-columns: 1fr; gap: 32px; }
+      #map { height: 320px; }
+    }
+    @media (max-width: 640px) {
+      .map-wrapper { padding: 52px 20px; }
+      #map { height: 260px; }
+    }
+
+    /* ─── SCROLL DOWN HINT ─── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      animation: bounce 2s infinite;
+      pointer-events: none;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ─── SCROLL TO TOP ─── */
+    .scroll-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #64748b;
+      font-size: 0.8rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+    .scroll-top:hover { color: var(--yellow); border-color: rgba(245,197,24,0.3); }
+
+    /* ─── NAVBAR MEDIUM SCREENS ─── */
+    @media (max-width: 1100px) and (min-width: 901px) {
+      .nav-links { gap: 2px; }
+      .nav-links a { font-size: 0.82rem; padding: 6px 8px; }
+      .nav-cta { padding: 8px 12px !important; }
+    }
+
+    /* ─── RESPONSIVE ─── */
+
+    /* ── Tablet 900px ── */
+    @media (max-width: 900px) {
+      /* Topbar — skrýt rating, zmenšit */
+      .topbar-inner { gap: 16px; font-size: 0.78rem; flex-wrap: wrap; }
+      .topbar-inner > *:last-child { display: none; }
+
+      /* Navbar */
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+
+      /* Hero */
+      .hero { min-height: auto; }
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 36px;
+        padding: 60px 24px 52px;
+      }
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+
+      /* Section */
+      .section { padding: 64px 24px; }
+
+      /* Services */
+      .services-grid { grid-template-columns: 1fr 1fr; }
+
+      /* About */
+      .about-grid { grid-template-columns: 1fr; gap: 32px; }
+      .img-ph-portrait { aspect-ratio: 16/9; }
+
+      /* Gallery */
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+
+      /* Why */
+      .why-grid { grid-template-columns: 1fr; gap: 40px; }
+
+      /* Pricing */
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .price-card.featured { position: static; padding-top: 30px; }
+      .price-badge { display: none; }
+
+      /* Contact */
+      .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+
+      /* Footer */
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+
+      /* Float CTA */
+      .float-cta { display: flex; }
+    }
+
+    /* ── Mobile 640px ── */
+    @media (max-width: 640px) {
+      /* Topbar — jen telefon */
+      .topbar-inner > *:not(:nth-child(2)) { display: none; }
+      .topbar-inner { justify-content: center; }
+
+      /* Hero */
+      .hero-inner { padding: 48px 20px 44px; gap: 28px; }
+      .hero h1 { font-size: 1.85rem; letter-spacing: -0.5px; }
+      .hero-sub { font-size: 0.92rem; }
+      .hero-btns { flex-direction: column; }
+      .hero-btns .btn { justify-content: center; }
+      .hero-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card { padding: 16px 12px; }
+      .stat-num { font-size: 1.6rem; }
+
+      /* Emergency */
+      .emergency-inner { flex-direction: column; text-align: center; gap: 8px; }
+      .emergency-phone { font-size: 1.4rem; }
+
+      /* Section */
+      .section { padding: 52px 20px; }
+      .section-title { font-size: 1.5rem; }
+
+      /* Services */
+      .services-grid { grid-template-columns: 1fr; }
+
+      /* Gallery */
+      .gallery-grid { grid-template-columns: 1fr; }
+
+      /* Pricing */
+      .pricing-grid { max-width: 100%; }
+
+      /* Contact form */
+      .form-row { grid-template-columns: 1fr; }
+
+      /* Footer */
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+      /* Float CTA — větší na telefonu */
+      .float-cta { bottom: 16px; right: 16px; font-size: 1rem; padding: 15px 22px; }
+    }
+
+    /* ── Malý mobil 380px ── */
+    @media (max-width: 380px) {
+      .hero h1 { font-size: 1.6rem; }
+      .hero-stats { grid-template-columns: 1fr 1fr; }
+      .cert-badges { flex-direction: column; }
+      .topbar-inner { padding: 0 16px; }
+      nav .nav-inner { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── TOPBAR ─── -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="topbar-item">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Po–Pá <strong>8:00–19:00</strong></span>
+    </span>
+    <a href="tel:+420704395355" class="topbar-item">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 9.5a19.79 19.79 0 01-3.07-8.57A2 2 0 013.44 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      <strong>+420 704 395 355</strong>
+    </a>
+    <a href="mailto:robert.cermak@email.cz" class="topbar-item">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <strong>robert.cermak@email.cz</strong>
+    </a>
+    <span class="topbar-item" style="margin-left:auto;">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <strong>4,9 / 5</strong>&nbsp;– 47 recenzí Google
+    </span>
+  </div>
+</div>
+
+<!-- ─── NAVBAR ─── -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      Instalatér <span>Čermák</span>
+      <small>Ostrava &amp; okolí</small>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#sluzby">Služby</a></li>
+      <li><a href="#o-mne">O mně</a></li>
+      <li><a href="#prace">Realizace</a></li>
+      <li><a href="#proc-my">Proč my</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#cenik">Ceník</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+      <li><a href="tel:+420704395355" class="nav-cta">📞 Zavolat</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#sluzby">Služby</a>
+    <a href="#o-mne">O mně</a>
+    <a href="#prace">Realizace</a>
+    <a href="#proc-my">Proč my</a>
+    <a href="#faq">Časté dotazy</a>
+    <a href="#cenik">Ceník</a>
+    <a href="#kontakt">Kontakt</a>
+    <a href="tel:+420704395355" class="m-cta">📞 Zavolat — 704 395 355</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <div class="anim">
+      <div class="hero-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Ostrava a okolí · do 30 km
+      </div>
+      <h1>Instalatér &amp; topenář,<br>který <em>přijede dnes</em></h1>
+      <p class="hero-sub">
+        Ucpaný odpad, teče voda, nefunguje topení? Zavolejte —
+        okamžitě poradím po telefonu a havarijní výjezd do 60 minut.
+      </p>
+      <div class="hero-btns">
+        <a href="tel:+420704395355" class="btn btn-yellow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 9.5a19.79 19.79 0 01-3.07-8.57A2 2 0 013.44 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          704 395 355 — Volat teď
+        </a>
+        <a href="#sluzby" class="btn btn-ghost">Prohlédnout služby</a>
+      </div>
+    </div>
+    <div class="hero-stats anim anim-d2">
+      <div class="stat-card">
+        <span class="stat-num">4,9★</span>
+        <span class="stat-label">Hodnocení Google<br>47 recenzí</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">24/7</span>
+        <span class="stat-label">Havarijní<br>pohotovost</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">15+</span>
+        <span class="stat-label">Let zkušeností<br>v oboru</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">60'</span>
+        <span class="stat-label">Max. čas výjezdu<br>k havárii</span>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</section>
+
+<!-- ─── EMERGENCY STRIP ─── -->
+<div class="emergency">
+  <div class="emergency-inner">
+    <div class="emergency-left">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="emergency-text">
+        Havárie? Nonstop pohotovostní linka
+        <small>Volejte kdykoliv — ve dne i v noci, víkendy a svátky nevyjímaje</small>
+      </div>
+    </div>
+    <a href="tel:+420704395355" class="emergency-phone">704 395 355</a>
+  </div>
+</div>
+
+<!-- ─── SERVICES ─── -->
+<section class="section services" id="sluzby">
+  <div class="section-inner">
+    <div class="section-tag anim">Co děláme</div>
+    <h2 class="section-title anim anim-d1">Instalatérské &amp; topenářské práce</h2>
+    <p class="section-sub anim anim-d2">Od kapajícího kohoutu po kompletní rekonstrukci koupelny nebo výměnu kotle — vždy kvalitně a načas.</p>
+    <div class="services-grid">
+
+      <div class="svc-card dark anim anim-d1">
+        <div class="svc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <h3>Havarijní služba 24/7</h3>
+        <p>Prasklá trubka, voda pod tlakem, nefunkční topení v zimě — výjezd do 60 minut. Dostupné nepřetržitě.</p>
+      </div>
+
+      <div class="svc-card anim anim-d2">
+        <div class="svc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <h3>Čištění odpadů</h3>
+        <p>Strojové i tlakové čištění ucpaného WC, dřezu, vany, sprchy nebo celé kanalizace. Do 100 mm průměru.</p>
+      </div>
+
+      <div class="svc-card anim anim-d3">
+        <div class="svc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg>
+        </div>
+        <h3>Topení &amp; kotle</h3>
+        <p>Servis a montáž plynových kotlů Immergas, tepelných čerpadel. Výměna radiátorů, ventilů, lisované spoje PPR.</p>
+      </div>
+
+      <div class="svc-card anim anim-d1">
+        <div class="svc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16"/><path d="M4 11V4a1 1 0 011-1h4a1 1 0 011 1v7"/><path d="M14 11V6a1 1 0 011-1h4a1 1 0 011 1v5"/><path d="M2 11h20"/><path d="M6 11v11"/><path d="M10 11v11"/><path d="M16 11v11"/><path d="M20 11v11"/></svg>
+        </div>
+        <h3>Rekonstrukce koupelny</h3>
+        <p>Kompletní přestavba — sprchový kout, vana, umyvadlo, WC. Rozvody vody a odpadů na míru, montáž zařizovacích předmětů.</p>
+      </div>
+
+      <div class="svc-card anim anim-d2">
+        <div class="svc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+        </div>
+        <h3>Voda &amp; rozvody</h3>
+        <p>Výměna baterií, hadičků, stojánků, rohových ventilů. Oprava protékající toalety, napouštěcí soupravy, zásobníky.</p>
+      </div>
+
+      <div class="svc-card anim anim-d3">
+        <div class="svc-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Servis &amp; certifikace</h3>
+        <p>Pravidelná údržba instalací. Certifikovaný technik — kotly Immergas, tepelná čerpadla, lisované spoje na potrubí.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABOUT ─── -->
+<section class="section about" id="o-mne">
+  <div class="section-inner">
+    <div class="about-grid">
+      <!-- FOTO: nahraďte <div class="img-ph"> za <img src="robert.jpg" alt="Robert Čermák – instalatér Ostrava"> -->
+      <div class="img-ph img-ph-portrait anim">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>Sem přijde vaše<br>fotka v práci</span>
+      </div>
+      <div class="about-text anim anim-d1">
+        <div>
+          <div class="section-tag" style="text-align:left;margin-bottom:8px;">O mně</div>
+          <h2>Robert Čermák —<br><span>vyučený instalatér</span><br>s 15 lety praxe</h2>
+        </div>
+        <p>Jsem vyučen v oboru instalatérství a topenářství. Na rozdíl od větších firem ke vám přijdu já osobně — žádní subdodavatelé, žádné call centrum. Každou zakázku dělám tak, jako kdybych ji dělal u sebe doma.</p>
+        <p>Specializuji se na poctivou řemeslnou práci: opravy, údržbu a menší rekonstrukce na území Ostravy a okolí do 30 km. Přes telefon jsem dostupný od 7:00 do 22:00 a rád poradím ještě než vůbec přijedu.</p>
+        <div class="cert-badges">
+          <div class="cert-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Certifikát Immergas
+          </div>
+          <div class="cert-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Tepelná čerpadla
+          </div>
+          <div class="cert-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Lisované spoje PPR
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── GALLERY ─── -->
+<section class="section gallery" id="prace">
+  <div class="section-inner">
+    <div class="section-tag anim">Realizace</div>
+    <h2 class="section-title anim anim-d1">Naše práce</h2>
+    <p class="section-sub anim anim-d2">Každá zakázka je dovedena do konce pečlivě a načas. Tady jsou ukázky z terénu.</p>
+    <div class="gallery-grid">
+
+      <div class="gallery-item anim anim-d1">
+        <!-- FOTO: <img src="foto1.jpg" alt="Rekonstrukce koupelny Ostrava"> -->
+        <div class="img-ph img-ph-landscape">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Foto 1</span>
+        </div>
+        <div class="overlay"><span class="gallery-tag">Rekonstrukce koupelny</span></div>
+      </div>
+
+      <div class="gallery-item anim anim-d2">
+        <div class="img-ph img-ph-landscape">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Foto 2</span>
+        </div>
+        <div class="overlay"><span class="gallery-tag">Čištění odpadu</span></div>
+      </div>
+
+      <div class="gallery-item anim anim-d3">
+        <div class="img-ph img-ph-landscape">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Foto 3</span>
+        </div>
+        <div class="overlay"><span class="gallery-tag">Montáž kotle</span></div>
+      </div>
+
+      <div class="gallery-item anim anim-d1">
+        <div class="img-ph img-ph-landscape">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Foto 4</span>
+        </div>
+        <div class="overlay"><span class="gallery-tag">Oprava vodovodní baterie</span></div>
+      </div>
+
+      <div class="gallery-item anim anim-d2">
+        <div class="img-ph img-ph-landscape">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Foto 5</span>
+        </div>
+        <div class="overlay"><span class="gallery-tag">Rozvody topení</span></div>
+      </div>
+
+      <div class="gallery-item anim anim-d3">
+        <div class="img-ph img-ph-landscape">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Foto 6</span>
+        </div>
+        <div class="overlay"><span class="gallery-tag">Havarijní oprava</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── WHY + REVIEWS ─── -->
+<section class="section why" id="proc-my">
+  <div class="section-inner">
+    <div class="section-tag anim">Proč Čermák</div>
+    <h2 class="section-title anim anim-d1">Poctivá práce, ne sliby</h2>
+    <p class="section-sub anim anim-d2">Nejsme firma s call centrem. Přijede přímo Robert Čermák — a práci odvede tak, aby se vrátila voda tam, kde má být.</p>
+    <div class="why-grid">
+      <ul class="why-list">
+        <li class="why-item anim anim-d1">
+          <div class="why-ico">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <h4>Certifikovaný odborník</h4>
+            <p>Certifikáty montáže kotlů Immergas, tepelných čerpadel a lisovaných spojů na potrubí PPR. Práce se zárukou.</p>
+          </div>
+        </li>
+        <li class="why-item anim anim-d2">
+          <div class="why-ico">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 9.5a19.79 19.79 0 01-3.07-8.57A2 2 0 013.44 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div>
+            <h4>Poradenství zdarma po telefonu</h4>
+            <p>Popište problém — okamžitě poradím co udělat než přijedu. Dostupné od 7:00 do 22:00 každý den.</p>
+          </div>
+        </li>
+        <li class="why-item anim anim-d3">
+          <div class="why-ico">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <div>
+            <h4>Žádné skryté poplatky</h4>
+            <p>Cena práce vychází z lokalitního průměru. Orientační cenu sdělím před výjezdem — bez překvapení na faktuře.</p>
+          </div>
+        </li>
+        <li class="why-item anim anim-d4">
+          <div class="why-ico">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <h4>Většina oprav do 24 hodin</h4>
+            <p>Drobné poruchy řeším nejčastěji tentýž den. Na havárii přijede do 60 minut od zavolání.</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="reviews-col">
+        <div class="rating-hero anim anim-d1">
+          <div class="rating-big">4,9</div>
+          <div>
+            <div class="rating-stars">★★★★★</div>
+            <div class="rating-info">
+              47 recenzí na Google
+              <small>Prověřený instalatér v Ostravě</small>
+            </div>
+          </div>
+        </div>
+        <div class="review-card anim anim-d2">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">„Spokojenost s rychlostí, pečlivostí a taky ochotou práce i v neděli. Voda teče, sprcha teče. Vše je jak má být, děkuji."</p>
+          <span class="review-author">Eva S. — před měsícem</span>
+        </div>
+        <div class="review-card anim anim-d3">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">„Pana Čermáka mohu doporučit, vynikající, zodpovědný a poctivá práce. Příjemné jednání. Velká spokojenost."</p>
+          <span class="review-author">Jarka R. — před 5 měsíci</span>
+        </div>
+        <div class="review-card anim anim-d4">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">„Havarijní situace vyřešena během hodiny. Pan Čermák přijel rychle, byl profesionální a cena odpovídala domluvě."</p>
+          <span class="review-author">Martin K. — před 2 měsíci</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FAQ ─── -->
+<section class="section faq" id="faq">
+  <div class="section-inner">
+    <div class="section-tag anim">Časté dotazy</div>
+    <h2 class="section-title anim anim-d1">Máte otázky?</h2>
+    <p class="section-sub anim anim-d2">Tady jsou odpovědi na to, co zákazníci řeší nejčastěji. Cokoliv dalšího — stačí zavolat.</p>
+    <div class="faq-list anim">
+
+      <div class="faq-item">
+        <button class="faq-q open" aria-expanded="true">
+          Jak rychle přijedete při havárii?
+          <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a" style="max-height:200px"><div class="faq-a-inner">Při havarijní situaci se snažím být na místě do 60 minut od zavolání. Havarijní linka je dostupná 24 hodin denně, 7 dní v týdnu — včetně víkendů a svátků.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Kolik přibližně bude oprava stát?
+          <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Orientační cenu sdělím po popisu problému ještě před výjezdem. Základní opravy a čištění odpadů od 800 Kč, havarijní výjezd mimo pracovní dobu od 1 200 Kč. Cena vždy zahrnuje i dopravu a práci — materiál se účtuje zvlášť dle skutečné spotřeby.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Pracujete i o víkendech a svátcích?
+          <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Ano. Havarijní výjezdy provádím 24/7 celý rok. Standardní servis (bez příplatku) je Po–Pá 8:00–19:00. Víkend a svátek jsou zpoplatněny příplatkem za mimopracovní dobu.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Jakou oblast pokrýváte?
+          <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Ostrava a okolí do přibližně 30 km — Bohumín, Havířov, Karviná, Opava, Frýdek-Místek a další. Na havárii jedu i dál, zavolejte a domluvíme se.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Dostanu doklad o opravě / fakturu?
+          <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Samozřejmě. Vystavuji daňový doklad za provedené práce. Firma může dostat fakturu s DPH na IČO — stačí říct předem.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Co mám dělat, než přijedete?
+          <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Při havárii s vodou: zavřete hlavní uzávěr vody (většinou v bytovém jádru nebo ve sklepě). Při poruše topení: nezvyšujte termostat, jen zavolejte. Rád poradím po telefonu ještě než přijedu — tím se někdy dá ušetřit i výjezd.</div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING ─── -->
+<section class="section pricing" id="cenik">
+  <div class="section-inner">
+    <div class="section-tag anim">Ceník</div>
+    <h2 class="section-title anim anim-d1">Transparentní ceny</h2>
+    <p class="section-sub anim anim-d2">Orientační sazby — přesnou nabídku dostanete po popisu problému. Žádná překvapení na faktuře.</p>
+    <div class="pricing-grid">
+
+      <div class="price-card anim anim-d1">
+        <div class="price-tag">Základní</div>
+        <div class="price-name">Čištění odpadu</div>
+        <div class="price-amount">od 800 Kč</div>
+        <div class="price-note">WC, dřez, vana, sprcha</div>
+        <ul class="price-features">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mechanické čištění</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sifony a přípojky</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Rychlý výjezd</li>
+        </ul>
+      </div>
+
+      <div class="price-card featured anim anim-d2">
+        <div class="price-badge">Nejčastější</div>
+        <div class="price-tag">Servis</div>
+        <div class="price-name">Oprava vody / topení</div>
+        <div class="price-amount">od 600 Kč/h</div>
+        <div class="price-note">+ materiál dle spotřeby</div>
+        <ul class="price-features">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Výměna baterie / ventilu</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Oprava protékající toalety</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Servis a čištění kotlů</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Rozvody vody / odpadů</li>
+        </ul>
+      </div>
+
+      <div class="price-card anim anim-d3">
+        <div class="price-tag">Urgentní</div>
+        <div class="price-name">Havarijní výjezd</div>
+        <div class="price-amount">od 1 200 Kč</div>
+        <div class="price-note">Mimo pracovní dobu, víkendy</div>
+        <ul class="price-features">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Výjezd do 60 minut</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Dostupné 24/7</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Okamžité řešení</li>
+        </ul>
+      </div>
+
+    </div>
+    <p class="anim" style="text-align:center;margin-top:28px;color:var(--gray);font-size:0.875rem;">
+      Přesnou nabídku zdarma — zavolejte nebo napište a popište situaci.
+    </p>
+  </div>
+</section>
+
+<!-- ─── MAP ─── -->
+<section class="map-section" id="oblast">
+  <div class="map-wrapper">
+    <div class="map-grid">
+
+      <div class="map-info anim">
+        <div>
+          <div class="section-tag" style="text-align:left;margin-bottom:8px;">Oblast působení</div>
+          <h2>Ostrava<br>a <span>okolí do 30 km</span></h2>
+        </div>
+        <p>Pracuji v celé Ostravě a přilehlých městech. Na havárii přijíždím odkudkoliv z vyznačené oblasti do 60 minut.</p>
+        <div class="map-towns">
+          <span class="map-town">Ostrava</span>
+          <span class="map-town">Opava</span>
+          <span class="map-town">Havířov</span>
+          <span class="map-town">Karviná</span>
+          <span class="map-town">Bohumín</span>
+          <span class="map-town">Frýdek-Místek</span>
+          <span class="map-town">Orlová</span>
+          <span class="map-town">Kopřivnice</span>
+        </div>
+        <a href="tel:+420704395355" class="btn btn-yellow" style="align-self:flex-start;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 9.5a19.79 19.79 0 01-3.07-8.57A2 2 0 013.44 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          Zavolat — 704 395 355
+        </a>
+      </div>
+
+      <div class="anim anim-d1">
+        <div id="map"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section class="section contact" id="kontakt">
+  <div class="section-inner">
+    <div class="section-tag anim">Kontakt</div>
+    <h2 class="section-title anim anim-d1">Napište nebo zavolejte</h2>
+    <p class="section-sub anim anim-d2">Formulář funguje — odpovídám do 2 hodin. Pro rychlou pomoc raději zavolejte.</p>
+    <div class="contact-grid">
+      <div class="contact-info anim">
+        <div class="contact-row">
+          <div class="c-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 9.5a19.79 19.79 0 01-3.07-8.57A2 2 0 013.44 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <div><h4>Telefon — havarijní linka 24/7</h4><a href="tel:+420704395355">+420 704 395 355</a></div>
+        </div>
+        <div class="contact-row">
+          <div class="c-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div><h4>E-mail</h4><a href="mailto:robert.cermak@email.cz">robert.cermak@email.cz</a></div>
+        </div>
+        <div class="contact-row">
+          <div class="c-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><h4>Oblast působení</h4><p>Ostrava a okolí do 30 km</p></div>
+        </div>
+        <div class="contact-row">
+          <div class="c-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><h4>Pracovní doba</h4><p>Po–Pá 8:00–19:00 | Havarijní 24/7</p></div>
+        </div>
+      </div>
+
+      <form class="contact-form anim anim-d1" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Jméno *</label>
+            <input type="text" placeholder="Jan Novák" required />
+          </div>
+          <div class="form-field">
+            <label>Telefon *</label>
+            <input type="tel" placeholder="+420 xxx xxx xxx" required />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>E-mail</label>
+          <input type="email" placeholder="jan.novak@email.cz" />
+        </div>
+        <div class="form-field">
+          <label>Typ problému</label>
+          <select>
+            <option value="" disabled selected>Vyberte...</option>
+            <option>Ucpaný odpad / WC</option>
+            <option>Teče voda / havárie</option>
+            <option>Topení / kotel</option>
+            <option>Rekonstrukce koupelny</option>
+            <option>Jiné</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Popis problému</label>
+          <textarea placeholder="Popište co se děje, kdy to nastalo, případně adresu..."></textarea>
+        </div>
+        <button type="submit" class="btn-send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Odeslat zprávu
+        </button>
+        <div class="form-success" id="formSuccess">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Zpráva odeslána! Ozveme se do 2 hodin.
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Instalatér <span>Čermák</span></div>
+        <p class="footer-desc">Vyučený instalatér a topenář s 15 lety praxe. Ostrava a okolí. Havarijní pohotovost 24/7.</p>
+        <a href="tel:+420704395355" class="footer-phone">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 9.5a19.79 19.79 0 01-3.07-8.57A2 2 0 013.44 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          704 395 355
+        </a>
+      </div>
+      <div class="footer-col">
+        <h5>Služby</h5>
+        <ul class="footer-links">
+          <li><a href="#sluzby">Havarijní služba</a></li>
+          <li><a href="#sluzby">Čištění odpadů</a></li>
+          <li><a href="#sluzby">Topení &amp; kotle</a></li>
+          <li><a href="#sluzby">Rekonstrukce koupelny</a></li>
+          <li><a href="#sluzby">Voda &amp; rozvody</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Rychlé odkazy</h5>
+        <ul class="footer-links">
+          <li><a href="#o-mne">O mně</a></li>
+          <li><a href="#prace">Realizace</a></li>
+          <li><a href="#faq">Časté dotazy</a></li>
+          <li><a href="#cenik">Ceník</a></li>
+          <li><a href="#kontakt">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Robert Čermák – Instalatér Ostrava | IČ: 12345678</span>
+      <a href="#" style="color:var(--gray);text-decoration:none;">Ochrana osobních údajů</a>
+      <a href="#" class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+        Zpět nahoru
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── FLOATING CTA (MOBILE) ─── -->
+<a href="tel:+420704395355" class="float-cta" id="floatCta">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 9.5a19.79 19.79 0 01-3.07-8.57A2 2 0 013.44 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+  Zavolat
+</a>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // ── Mapa Ostrava
+  const map = L.map('map', {
+    center: [49.8209, 18.2625],
+    zoom: 9,
+    scrollWheelZoom: false,
+    zoomControl: true
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Okruh 30 km
+  L.circle([49.8209, 18.2625], {
+    radius: 30000,
+    color: '#c9a200',
+    weight: 2,
+    fillColor: '#F5C518',
+    fillOpacity: 0.12,
+    dashArray: '6, 4'
+  }).addTo(map);
+
+  // Vlastní ikona markeru
+  const icon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:40px;height:40px;
+      background:#F5C518;
+      border:3px solid #c9a200;
+      border-radius:50% 50% 50% 0;
+      transform:rotate(-45deg);
+      box-shadow:0 4px 12px rgba(0,0,0,0.25);
+    "></div>`,
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -44]
+  });
+
+  const marker = L.marker([49.8209, 18.2625], { icon })
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:'Inter',sans-serif;padding:4px 2px;min-width:160px;">
+        <strong style="font-size:0.95rem;">Instalatér Čermák</strong><br>
+        <span style="color:#64748b;font-size:0.82rem;">Ostrava • Havarijní 24/7</span><br>
+        <a href="tel:+420704395355" style="display:inline-block;margin-top:8px;background:#F5C518;color:#0f172a;font-weight:700;font-size:0.82rem;padding:5px 12px;border-radius:6px;text-decoration:none;">
+          📞 704 395 355
+        </a>
+      </div>
+    `);
+
+  // Popup otevřít jen na desktopu, na mobilu by překážel
+  if (window.innerWidth > 640) marker.openPopup();
+
+  // ── Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    });
+  });
+
+  // ── Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.anim').forEach(el => observer.observe(el));
+
+  // ── Scroll spy
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  const scrollSpy = () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  };
+  window.addEventListener('scroll', scrollSpy, { passive: true });
+  scrollSpy(); // spustit hned při načtení
+
+  // ── FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const answer = btn.nextElementSibling;
+      const isOpen = btn.classList.contains('open');
+      document.querySelectorAll('.faq-q.open').forEach(b => {
+        b.classList.remove('open');
+        b.setAttribute('aria-expanded', 'false');
+        b.nextElementSibling.style.maxHeight = null;
+      });
+      if (!isOpen) {
+        btn.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        // scroll into view if below viewport
+        setTimeout(() => {
+          const rect = btn.getBoundingClientRect();
+          if (rect.top < 80) btn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      }
+    });
+  });
+
+  // ── Contact form
+  function handleSubmit(e) {
+    e.preventDefault();
+    const success = document.getElementById('formSuccess');
+    success.style.display = 'flex';
+    e.target.querySelector('.btn-send').style.display = 'none';
+  }
+
+  // ── Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+
+  // ── Show float CTA after hero scroll
+  const floatCta = document.getElementById('floatCta');
+  window.addEventListener('scroll', () => {
+    floatCta.style.display = window.scrollY > 500 ? 'flex' : 'none';
+  }, { passive: true });
+</script>
+</body>
+</html>
