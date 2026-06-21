@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Návrh – Nový web pro Instalatér Čermák</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #F5C518;
+      --dark: #111827;
+      --gray: #6b7280;
+      --light: #f9fafb;
+      --border: #e5e7eb;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: var(--dark);
+      background: #f3f4f6;
+      padding: 40px 20px;
+    }
+
+    .doc {
+      max-width: 780px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.1);
+    }
+
+    /* HEADER */
+    .doc-header {
+      background: var(--dark);
+      color: white;
+      padding: 48px 56px;
+    }
+    .doc-header .tag {
+      display: inline-block;
+      background: var(--yellow);
+      color: var(--dark);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    .doc-header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    .doc-header h1 span { color: var(--yellow); }
+    .doc-header .subtitle {
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+    .meta-row {
+      display: flex;
+      gap: 32px;
+      margin-top: 32px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      flex-wrap: wrap;
+    }
+    .meta-item label {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #6b7280;
+      margin-bottom: 3px;
+    }
+    .meta-item span {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #d1d5db;
+    }
+
+    /* BODY */
+    .doc-body { padding: 48px 56px; }
+
+    /* SECTION */
+    .section { margin-bottom: 48px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .section-num {
+      width: 32px;
+      height: 32px;
+      background: var(--yellow);
+      color: var(--dark);
+      font-weight: 800;
+      font-size: 0.85rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .section h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    p { font-size: 0.95rem; color: #374151; line-height: 1.65; }
+
+    /* PROBLEM TABLE */
+    .problem-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .problem-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .problem-item.warning {
+      background: #fffbeb;
+      border-color: #fcd34d;
+    }
+    .problem-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .problem-item strong { display: block; font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .problem-item p { font-size: 0.85rem; color: var(--gray); margin: 0; }
+
+    /* COMPARE TABLE */
+    .compare {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+    .compare th {
+      background: var(--dark);
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+    .compare th:first-child { border-radius: 8px 0 0 0; }
+    .compare th:last-child { border-radius: 0 8px 0 0; }
+    .compare td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: #374151;
+      vertical-align: top;
+    }
+    .compare tr:last-child td { border-bottom: none; }
+    .compare tr:nth-child(even) td { background: var(--light); }
+    .bad { color: #dc2626; font-weight: 500; }
+    .good { color: #16a34a; font-weight: 500; }
+
+    /* DELIVERABLES */
+    .deliverables {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .deliverable {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: var(--light);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .deliverable-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--yellow);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .deliverable strong { display: block; font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
+    .deliverable p { font-size: 0.82rem; color: var(--gray); margin: 0; }
+
+    /* PRICING */
+    .price-box {
+      background: var(--dark);
+      border-radius: 12px;
+      padding: 32px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .price-box .price-main {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--yellow);
+    }
+    .price-box .price-label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .price-features-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .price-features-list li {
+      font-size: 0.88rem;
+      color: #d1d5db;
+    }
+    .price-features-list li::before { content: '✓ '; color: var(--yellow); font-weight: 700; }
+
+    /* TIMELINE */
+    .timeline { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+    .timeline-item {
+      display: flex;
+      gap: 20px;
+      position: relative;
+    }
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 36px;
+      width: 2px;
+      height: calc(100% - 8px);
+      background: var(--border);
+    }
+    .timeline-dot {
+      width: 32px;
+      height: 32px;
+      background: var(--yellow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--dark);
+      flex-shrink: 0;
+      margin-top: 2px;
+      z-index: 1;
+    }
+    .timeline-content {
+      padding-bottom: 24px;
+    }
+    .timeline-content strong { display: block; font-size: 0.92rem; font-weight: 700; margin-bottom: 2px; }
+    .timeline-content p { font-size: 0.85rem; color: var(--gray); margin: 0; }
+
+    /* CTA */
+    .cta-box {
+      background: var(--yellow);
+      border-radius: 12px;
+      padding: 36px;
+      text-align: center;
+      margin-top: 4px;
+    }
+    .cta-box h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+    .cta-box p { color: #374151; font-size: 0.92rem; margin-bottom: 24px; }
+    .cta-contact { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+    .cta-item {
+      background: var(--dark);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    /* FOOTER */
+    .doc-footer {
+      background: var(--light);
+      border-top: 1px solid var(--border);
+      padding: 24px 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .doc-footer p { font-size: 0.8rem; color: var(--gray); margin: 0; }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .doc { box-shadow: none; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="doc">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="tag">Návrh spolupráce</div>
+    <h1>Nový web pro<br><span>Instalatér Čermák</span></h1>
+    <p class="subtitle">Jak modernizovaný web přivede víc zákazníků z Ostravy</p>
+    <div class="meta-row">
+      <div class="meta-item">
+        <label>Připravil</label>
+        <span>[Vaše jméno]</span>
+      </div>
+      <div class="meta-item">
+        <label>Datum</label>
+        <span>Červen 2026</span>
+      </div>
+      <div class="meta-item">
+        <label>Pro</label>
+        <span>Robert Čermák — instalater.info</span>
+      </div>
+      <div class="meta-item">
+        <label>Demo k dispozici</label>
+        <span>Ano — ihned ke zhlédnutí</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <!-- 1. ÚVOD -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <h2>Proč vám píšu</h2>
+      </div>
+      <p>
+        Narazil jsem na váš web <strong>instalater.info</strong> a vidím, že máte výborné hodnocení
+        4,9 hvězdy na Googlu — to je silný argument, který váš web bohužel nevyužívá.
+        Zároveň jsem na webu našel několik problémů, které vám přímo odrazují zákazníky.
+        Udělal jsem proto ukázku toho, jak by váš web mohl vypadat — bez závazků, zdarma.
+      </p>
+    </div>
+
+    <!-- 2. PROBLÉMY -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <h2>Co stávající web stojí zákazníky</h2>
+      </div>
+      <div class="problem-list">
+        <div class="problem-item">
+          <div class="problem-icon">🚨</div>
+          <div>
+            <strong>Kontaktní formulář nefunguje</strong>
+            <p>Tlačítko na stránce /contact.html říká doslova „Nefunguje – Neodeslat". Zákazník chce napsat, nemůže — a odejde ke konkurenci.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-icon">✉️</div>
+          <div>
+            <strong>Překlep v e-mailové adrese</strong>
+            <p>Na stránce /odpad.html je uveden email „robert-cermak@emial.cz" místo správného. Zprávy od zákazníků vám nikdy nedorazí.</p>
+          </div>
+        </div>
+        <div class="problem-item warning">
+          <div class="problem-icon">🗺️</div>
+          <div>
+            <strong>Tři různé navigace na třech stránkách</strong>
+            <p>Hlavní stránka, /odpad.html a /contact.html mají každá jiné menu. Zákazník se na webu ztrácí a nedůvěřuje firmě.</p>
+          </div>
+        </div>
+        <div class="problem-item warning">
+          <div class="problem-icon">📝</div>
+          <div>
+            <strong>Titulky jsou keyword stuffing, ne pro lidi</strong>
+            <p>„Instalatér Ostrava topenář vodař instalatérství havarijní služba voda" — Google takovýto spam penalizuje a zákazník text nečte.</p>
+          </div>
+        </div>
+        <div class="problem-item warning">
+          <div class="problem-icon">⭐</div>
+          <div>
+            <strong>Hodnocení 4,9 ★ je skryté a nevyužité</strong>
+            <p>Váš největší prodejní argument — 47 recenzí — je schovaný v textu. Zákazník ho nevidí.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. POROVNÁNÍ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <h2>Starý web vs. nový web</h2>
+      </div>
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>Oblast</th>
+            <th>Stávající web</th>
+            <th>Nový web</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Kontaktní formulář</strong></td>
+            <td class="bad">❌ Nefunguje</td>
+            <td class="good">✓ Funkční, s potvrzením</td>
+          </tr>
+          <tr>
+            <td><strong>Havarijní linka</strong></td>
+            <td class="bad">Skrytá v textu</td>
+            <td class="good">✓ Prominentní banner, vždy viditelný</td>
+          </tr>
+          <tr>
+            <td><strong>Google hodnocení 4,9★</strong></td>
+            <td class="bad">Neviditelné</td>
+            <td class="good">✓ Hero sekce + sekce recenzí</td>
+          </tr>
+          <tr>
+            <td><strong>Navigace</strong></td>
+            <td class="bad">3 různé verze na 3 stránkách</td>
+            <td class="good">✓ Jedna konzistentní, sticky navbar</td>
+          </tr>
+          <tr>
+            <td><strong>Mobilní zobrazení</strong></td>
+            <td class="bad">Nepřizpůsobené</td>
+            <td class="good">✓ Mobile-first design</td>
+          </tr>
+          <tr>
+            <td><strong>Rychlost načtení</strong></td>
+            <td class="bad">Pomalá (velké obrázky, plugin Facebook)</td>
+            <td class="good">✓ Optimalizovaná, bez zbytečných pluginů</td>
+          </tr>
+          <tr>
+            <td><strong>Ceník</strong></td>
+            <td class="bad">Chybí nebo nenajdete</td>
+            <td class="good">✓ Přehledný ceník s orientačními cenami</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. CO DOSTANETE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <h2>Co dostanete</h2>
+      </div>
+      <div class="deliverables">
+        <div class="deliverable">
+          <div class="deliverable-icon">🎨</div>
+          <div>
+            <strong>Moderní design</strong>
+            <p>Profesionální vzhled, který budí důvěru. S vašimi barvami a fotkami.</p>
+          </div>
+        </div>
+        <div class="deliverable">
+          <div class="deliverable-icon">📱</div>
+          <div>
+            <strong>Mobilní verze</strong>
+            <p>60 % zákazníků hledá instalatéra na mobilu. Web bude fungovat perfektně.</p>
+          </div>
+        </div>
+        <div class="deliverable">
+          <div class="deliverable-icon">📋</div>
+          <div>
+            <strong>Funkční kontaktní formulář</strong>
+            <p>Zprávy od zákazníků vám přijdou přímo na e-mail.</p>
+          </div>
+        </div>
+        <div class="deliverable">
+          <div class="deliverable-icon">🔍</div>
+          <div>
+            <strong>Základní SEO</strong>
+            <p>Správné titulky a struktura — web bude lépe dohledatelný na Googlu.</p>
+          </div>
+        </div>
+        <div class="deliverable">
+          <div class="deliverable-icon">⚡</div>
+          <div>
+            <strong>Rychlost načtení</strong>
+            <p>Optimalizované obrázky a čistý kód — web se načte rychle i na 4G.</p>
+          </div>
+        </div>
+        <div class="deliverable">
+          <div class="deliverable-icon">🛠️</div>
+          <div>
+            <strong>Podpora po spuštění</strong>
+            <p>30 dní bezplatných oprav po spuštění. Drobné úpravy textu zdarma.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. INVESTICE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <h2>Investice</h2>
+      </div>
+      <div class="price-box">
+        <div>
+          <div class="price-main">[X.XXX Kč]</div>
+          <div class="price-label">jednorázová platba · bez skrytých poplatků</div>
+        </div>
+        <ul class="price-features-list">
+          <li>Design + vývoj webu</li>
+          <li>Funkční kontaktní formulář</li>
+          <li>Mobilní verze (responsive)</li>
+          <li>Základní SEO nastavení</li>
+          <li>30 dní podpora po spuštění</li>
+          <li>Předání zdrojových souborů</li>
+        </ul>
+      </div>
+      <p style="margin-top:12px;font-size:0.85rem;color:var(--gray);">
+        * Hosting a doménové poplatky nejsou součástí ceny (platíte je přímo poskytovateli, obvykle 500–1 500 Kč/rok).
+      </p>
+    </div>
+
+    <!-- 6. TIMELINE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <h2>Jak to probíhá</h2>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot">1</div>
+          <div class="timeline-content">
+            <strong>Úvodní schůzka / hovor (30 min)</strong>
+            <p>Projdeme vaše požadavky, obsah webu a přípravy — co chcete zdůraznit, jaké služby, fotky.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">2</div>
+          <div class="timeline-content">
+            <strong>Návrh designu (3–5 dní)</strong>
+            <p>Ukážu vám, jak bude web vypadat. Zapracuji vaše připomínky.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">3</div>
+          <div class="timeline-content">
+            <strong>Vývoj a testování (5–7 dní)</strong>
+            <p>Sestavím funkční web, otestuji formuláře, mobil a rychlost.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">4</div>
+          <div class="timeline-content">
+            <strong>Spuštění (1 den)</strong>
+            <p>Nasazení na váš hosting nebo pomoc s výběrem nového. Web je online.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">5</div>
+          <div class="timeline-content">
+            <strong>Podpora 30 dní</strong>
+            <p>Drobné úpravy a opravy zdarma. Předám vám přístup ke správě webu.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. CTA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <h2>Jak začít</h2>
+      </div>
+      <div class="cta-box">
+        <h3>Podívejte se na demo — nezávazně</h3>
+        <p>Připravil jsem ukázku vašeho nového webu. Pošlu vám odkaz nebo předvedu osobně — zabere to 5 minut.</p>
+        <div class="cta-contact">
+          <a href="tel:+420XXXXXXXXX" class="cta-item">📞 Zavolat — [číslo]</a>
+          <a href="mailto:vas@email.cz" class="cta-item">✉️ Napsat — [email]</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /doc-body -->
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <p>Připravil: <strong>[Vaše jméno]</strong> · [Váš email] · [Vaše číslo]</p>
+    <p>Nabídka platí 30 dní od data odeslání.</p>
+  </div>
+
+</div>
+</body>
+</html>
